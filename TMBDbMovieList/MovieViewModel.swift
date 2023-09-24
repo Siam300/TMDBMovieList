@@ -42,6 +42,25 @@ class MovieViewModel: ObservableObject {
         }
         dataTask.resume()
     }
+    
+    func getLocalImage(for imagePath: String?) -> URL? {
+        guard let imagePath = imagePath else { return nil }
+
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let localImageUrl = documentsDirectory.appendingPathComponent(imagePath)
+
+        if !FileManager.default.fileExists(atPath: localImageUrl.path) {
+            let remoteImageUrl = URL(string: "https://image.tmdb.org/t/p/w500\(imagePath)")!
+            do {
+                let imageData = try Data(contentsOf: remoteImageUrl)
+                try imageData.write(to: localImageUrl)
+            } catch {
+                print("Error saving image data: \(error)")
+                return nil
+            }
+        }
+        return localImageUrl
+    }
 }
 
 struct MovieResponse: Decodable {
