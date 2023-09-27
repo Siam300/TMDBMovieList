@@ -100,6 +100,7 @@ struct MovieListView_Previews: PreviewProvider {
 struct MovieDetailsView: View {
     @ObservedObject var viewModel: MovieViewModel
     let movie: Movie
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack {
@@ -121,27 +122,40 @@ struct MovieDetailsView: View {
                     Text("Release Date: \(movie.release_date)")
                         .font(.headline)
                 }
+                Spacer()
                 if let posterPath = movie.poster_path,
                    let url = URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)") {
                     URLImage(url: url)
-                        //.resizable()
+                    //.resizable()
                         .scaledToFit()
-                        .frame(width: 120, height: 200)
+                        .frame(width: 150, height: 200)
                 }
             }
-            
-            Text("Overview: \(movie.overview)")
-                .font(.subheadline)
-            if let backdropPath = movie.backdrop_path,
-               let url = URL(string: "https://image.tmdb.org/t/p/w500\(backdropPath)") {
-                URLImage(url: url)
-                    .aspectRatio(contentMode: .fill)
-                    .frame(height: 200)
-                    .cornerRadius(10)
-                    .padding(.top, 10)
-            } else {
-                Text("No backdrop image available")
+            ScrollView{
+                Text("Overview: \(movie.overview)")
+                    .font(.subheadline)
+                if let backdropPath = movie.backdrop_path,
+                   let url = URL(string: "https://image.tmdb.org/t/p/w500\(backdropPath)") {
+                    URLImage(url: url)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 200)
+                        .cornerRadius(10)
+                        .padding(.top, 10)
+                } else {
+                    Image(systemName: "photo")
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 200)
+                        .cornerRadius(10)
+                        .padding(.top, 10)
+                }
             }
+            Button(action: {
+                presentationMode.wrappedValue.dismiss()
+            }, label: {
+                Image(systemName: "xmark.circle")
+                    .font(.largeTitle)
+                    .foregroundColor(Color.black)
+            })
         }
         .padding(.vertical)
         .background(Color.white)
@@ -153,5 +167,20 @@ struct MovieDetailsView: View {
                 .stroke(Color.black, lineWidth: 2)
         )
         .padding(20)
+    }
+}
+
+struct FullScreenImageView: View {
+    let url: URL
+    
+    var body: some View {
+        if let data = try? Data(contentsOf: url), let uiImage = UIImage(data: data) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFit()
+            //.edgesIgnoringSafeArea(.all)
+        } else {
+            Text("Error loading image")
+        }
     }
 }
