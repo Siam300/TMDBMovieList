@@ -8,15 +8,23 @@
 import SwiftUI
 
 struct URLImage: View {
-    let urlString: String
-    @State var data: Data?
+    @ObservedObject var imageLoader: ImageLoader
+    let placeholder: Image
+    
+    init(url: URL, placeholder: Image = Image(systemName: "photo")) {
+        imageLoader = ImageLoader(url: url)
+        self.placeholder = placeholder
+    }
     
     var body: some View {
-        if let data = data, let uiimage = UIImage(data: data) {
-            Image(uiImage: uiimage)
+        if let uiImage = imageLoader.image {
+            Image(uiImage: uiImage)
                 .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 130, height: 70)
+                .scaledToFit()
+        } else {
+            placeholder
+                .resizable()
+                .scaledToFit()
         }
     }
 }
@@ -34,8 +42,12 @@ struct MovieListView: View {
                         selectedMovie = movie
                     }) {
                         HStack {
-                            if let localImage = viewModel.getLocalImage(for: movie.poster_path) {
-                                Image(uiImage: UIImage(contentsOfFile: localImage.path)!)
+                            if let posterPath = movie.poster_path,
+                               let url = URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)") {
+                                URLImage(url: url)
+                                    .frame(width: 150, height: 200)
+                            } else {
+                                Image(systemName: "photo")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 150, height: 200)
@@ -71,14 +83,13 @@ struct MovieListView: View {
                 viewModel.getData()
             }
             .sheet(item: $selectedMovie) { movie in
-                MovieDetailsView(movie: movie)
+                MovieDetailsView(viewModel: viewModel, movie: movie)
             }
         }
         .listStyle(PlainListStyle())
         .background(Color.black)
     }
 }
-
 
 struct MovieListView_Previews: PreviewProvider {
     static var previews: some View {
@@ -87,34 +98,52 @@ struct MovieListView_Previews: PreviewProvider {
 }
 
 struct MovieDetailsView: View {
+    @ObservedObject var viewModel: MovieViewModel
     let movie: Movie
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack {
+            Spacer()
             Text("Title: \(movie.title)")
-                .font(.headline)
-            Text("Language: \(movie.original_language)")
-                .font(.subheadline)
-            Text(String(format: "Rating: %.1f/10", movie.vote_average))
-                .font(.subheadline)
-            Text("Vote Count: \(movie.vote_count)")
-                .font(.subheadline)
-            Text(String(format: "Poluparity: %.3f", movie.popularity))
-                .font(.subheadline)
-            Text("Release Date: \(movie.release_date)")
-                .font(.subheadline)
+                .fontWeight(.bold)
+                .font(.title)
+                .multilineTextAlignment(.center)
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Language: \(movie.original_language)")
+                        .font(.headline)
+                    Text(String(format: "Rating: %.1f/10", movie.vote_average))
+                        .font(.headline)
+                    Text("Vote Count: \(movie.vote_count)")
+                        .font(.headline)
+                    Text(String(format: "Popularity: %.3f", movie.popularity))
+                        .font(.headline)
+                    Text("Release Date: \(movie.release_date)")
+                        .font(.headline)
+                }
+                if let posterPath = movie.poster_path,
+                   let url = URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)") {
+                    URLImage(url: url)
+                        //.resizable()
+                        .scaledToFit()
+                        .frame(width: 120, height: 200)
+                }
+            }
+            
             Text("Overview: \(movie.overview)")
                 .font(.subheadline)
-            if let backdropPath = movie.backdrop_path {
-                Image(uiImage: getImage(from: backdropPath))
-                    .resizable()
+            if let backdropPath = movie.backdrop_path,
+               let url = URL(string: "https://image.tmdb.org/t/p/w500\(backdropPath)") {
+                URLImage(url: url)
                     .aspectRatio(contentMode: .fill)
                     .frame(height: 200)
                     .cornerRadius(10)
                     .padding(.top, 10)
+            } else {
+                Text("No backdrop image available")
             }
         }
-        .padding()
+        .padding(.vertical)
         .background(Color.white)
         .cornerRadius(10)
         .padding(10)
@@ -124,15 +153,5 @@ struct MovieDetailsView: View {
                 .stroke(Color.black, lineWidth: 2)
         )
         .padding(20)
-    }
-    
-    func getImage(from urlString: String) -> UIImage {
-        guard let url = URL(string: "https://image.tmdb.org/t/p/w500\(urlString)"),
-              let data = try? Data(contentsOf: url),
-              let image = UIImage(data: data)
-        else {
-            return UIImage()
-        }
-        return image
     }
 }

@@ -7,6 +7,25 @@
 
 import SwiftUI
 import Foundation
+import UIKit
+import Combine
+
+class ImageLoader: ObservableObject {
+    @Published var image: UIImage?
+    private var cancellable: AnyCancellable?
+    
+    init(url: URL) {
+        self.loadImage(from: url)
+    }
+    
+    private func loadImage(from url: URL) {
+        cancellable = URLSession.shared.dataTaskPublisher(for: url)
+            .map { UIImage(data: $0.data) }
+            .replaceError(with: nil)
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.image, on: self)
+    }
+}
 
 class MovieViewModel: ObservableObject {
     @Published var movies: [Movie] = []
@@ -43,23 +62,35 @@ class MovieViewModel: ObservableObject {
         dataTask.resume()
     }
     
-    func getLocalImage(for imagePath: String?) -> URL? {
-        guard let imagePath = imagePath else { return nil }
+    func getLocalImage(for imagePath: String?, completion: @escaping (URL?) -> Void) {
+        guard let imagePath = imagePath else {
+            completion(nil)
+            return
+        }
 
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let localImageUrl = documentsDirectory.appendingPathComponent(imagePath)
 
-        if !FileManager.default.fileExists(atPath: localImageUrl.path) {
+        if FileManager.default.fileExists(atPath: localImageUrl.path) {
+            completion(localImageUrl)
+        } else {
             let remoteImageUrl = URL(string: "https://image.tmdb.org/t/p/w500\(imagePath)")!
-            do {
-                let imageData = try Data(contentsOf: remoteImageUrl)
-                try imageData.write(to: localImageUrl)
-            } catch {
-                print("Error saving image data: \(error)")
-                return nil
+            let task = URLSession.shared.dataTask(with: remoteImageUrl) { data, response, error in
+                guard let data = data, error == nil else {
+                    print("Error downloading image data: \(error ?? NSError())")
+                    completion(nil)
+                    return
+                }
+                do {
+                    try data.write(to: localImageUrl)
+                    completion(localImageUrl)
+                } catch {
+                    print("Error saving image data: \(error)")
+                    completion(nil)
+                }
             }
+            task.resume()
         }
-        return localImageUrl
     }
 }
 
