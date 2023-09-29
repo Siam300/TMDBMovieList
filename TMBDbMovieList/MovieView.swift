@@ -103,6 +103,9 @@ struct MovieDetailsView: View {
     @ObservedObject var viewModel: MovieViewModel
     let movie: Movie
     @Environment(\.presentationMode) var presentationMode
+    @State private var isPosterFullScreen = false
+    @State private var isBackdropFullScreen = false
+    @State private var isFullScreen = false
     
     var body: some View {
         ZStack {
@@ -129,10 +132,18 @@ struct MovieDetailsView: View {
                     }
                     Spacer()
                     if let posterPath = movie.poster_path,
-                       let url = URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)") {
-                        URLImage(url: url)
-                            .scaledToFit()
-                            .frame(width: 120, height: 200)
+                       let posterURL = URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)") {
+                        Button(action: {
+                            isPosterFullScreen.toggle()
+                        }) {
+                            URLImage(url: posterURL)
+                                .scaledToFit()
+                                .frame(width: isPosterFullScreen ? UIScreen.main.bounds.width : 120,
+                                       height: isPosterFullScreen ? UIScreen.main.bounds.height : 200)
+                        }
+                        .fullScreenCover(isPresented: $isPosterFullScreen) {
+                            FullScreenImageView(isFullScreen: $isPosterFullScreen, imageUrl: posterURL, imageLoader: ImageLoader(url: posterURL))
+                        }
                     }
                 }
                 Spacer()
@@ -140,17 +151,23 @@ struct MovieDetailsView: View {
                     Text("Overview: \(movie.overview)")
                         .font(.headline)
                     if let backdropPath = movie.backdrop_path,
-                       let url = URL(string: "https://image.tmdb.org/t/p/w500\(backdropPath)") {
-                        URLImage(url: url)
-                            .aspectRatio(contentMode: .fit)
-                            .frame(height: 200)
-                            .cornerRadius(10)
-                            .padding(.top, 10)
-                        
+                       let backdropURL = URL(string: "https://image.tmdb.org/t/p/w500\(backdropPath)") {
+                        Button(action: {
+                            isBackdropFullScreen.toggle()
+                        }) {
+                            URLImage(url: backdropURL)
+                                .scaledToFit()
+                                .frame(height: 200)
+                                .cornerRadius(10)
+                                .padding(.top, 10)
+                        }
+                        .fullScreenCover(isPresented: $isBackdropFullScreen) {
+                            FullScreenImageView(isFullScreen: $isBackdropFullScreen, imageUrl: backdropURL, imageLoader: ImageLoader(url: backdropURL))
+                        }
                     } else {
                         Image(systemName: "photo")
                             .aspectRatio(contentMode: .fit)
-                            .frame(height: 200)
+                            .frame(width: .infinity, height: 200)
                             .cornerRadius(10)
                             .padding(.top, 10)
                     }
@@ -173,6 +190,35 @@ struct MovieDetailsView: View {
             //                    .stroke(Color.black, lineWidth: 2)
             //            )
             .padding(20)
+        }
+    }
+}
+
+struct FullScreenImageView: View {
+    @Binding var isFullScreen: Bool
+    let imageUrl: URL
+    @ObservedObject var imageLoader: ImageLoader
+
+    var body: some View {
+        ZStack {
+            Color("secondary")
+                .edgesIgnoringSafeArea(.all)
+            if let uiImage = imageLoader.image {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .foregroundColor(.white)
+                    .cornerRadius(15)
+                    .padding()
+            }
+        }
+        .onTapGesture {
+            withAnimation(.easeInOut(duration: 0.5)) {
+                isFullScreen.toggle()
+            }
+        }
+        .onAppear {
+            imageLoader.loadImage(from: imageUrl)
         }
     }
 }
