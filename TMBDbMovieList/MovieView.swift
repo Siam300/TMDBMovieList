@@ -19,9 +19,7 @@ struct MovieListView: View {
                 List {
                     ForEach(viewModel.movies.indices, id: \.self) { index in
                         let movie = viewModel.movies[index]
-                        Button(action: {
-                            selectedMovie = movie
-                        }) {
+                        NavigationLink(destination: MovieDetailsView(viewModel: viewModel, movie: movie)) {
                             HStack {
                                 if let posterPath = movie.poster_path,
                                    let url = URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)") {
@@ -40,7 +38,6 @@ struct MovieListView: View {
                                 .cornerRadius(10)
                                 .foregroundColor(.black)
                             }
-                            //.background(Color("primary"))
                             .edgesIgnoringSafeArea(.all)
                         }
                     }
@@ -48,13 +45,9 @@ struct MovieListView: View {
                 }
                 .padding(0)
                 .navigationBarTitle("Top 20 Movies")
-                .sheet(item: $selectedMovie) { movie in
-                    MovieDetailsView(viewModel: viewModel, movie: movie)
-                }
             }
         }
         .listStyle(PlainListStyle())
-        //.background(Color("primary"))
     }
     
     func TextView(index: Int, movie: Movie) -> some View {
@@ -111,58 +104,49 @@ struct MovieDetailsView: View {
         ZStack {
             Color("secondary")
                 .edgesIgnoringSafeArea(.all)
-            VStack {
-                Spacer()
-                Text("Title: \(movie.title)")
-                    .fontWeight(.bold)
-                    .font(.title)
-                    .multilineTextAlignment(.center)
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("Language: \(movie.original_language)")
-                            .font(.headline)
-                        Text(String(format: "Rating: %.1f/10", movie.vote_average))
-                            .font(.headline)
-                        Text("Vote Count: \(movie.vote_count)")
-                            .font(.headline)
-                        Text(String(format: "Popularity: %.3f", movie.popularity))
-                            .font(.headline)
-                        Text("Release Date: \(movie.release_date)")
-                            .font(.headline)
-                    }
-                    Spacer()
-                    if let posterPath = movie.poster_path,
-                       let posterURL = URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)") {
-                        Button(action: {
-                            isPosterFullScreen.toggle()
-                        }) {
-                            URLImage(url: posterURL)
-                                .scaledToFit()
-                                .frame(width: isPosterFullScreen ? UIScreen.main.bounds.width : 120,
-                                       height: isPosterFullScreen ? UIScreen.main.bounds.height : 200)
+            ScrollView{
+                VStack {
+                    Text("Title: \(movie.title)")
+                        .fontWeight(.bold)
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Language: \(movie.original_language)")
+                                .font(.headline)
+                            Text(String(format: "Rating: %.1f/10", movie.vote_average))
+                                .font(.headline)
+                            Text("Vote Count: \(movie.vote_count)")
+                                .font(.headline)
+                            Text(String(format: "Popularity: %.3f", movie.popularity))
+                                .font(.headline)
+                            Text("Release Date: \(movie.release_date)")
+                                .font(.headline)
                         }
-                        .fullScreenCover(isPresented: $isPosterFullScreen) {
-                            FullScreenImageView(isFullScreen: $isPosterFullScreen, imageUrl: posterURL, imageLoader: ImageLoader(url: posterURL))
+                        if let posterPath = movie.poster_path,
+                           let posterURL = URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)") {
+                            NavigationLink(destination: FullScreenImageView(isFullScreen: $isPosterFullScreen, imageUrl: posterURL, imageLoader: ImageLoader(url: posterURL))) {
+                                URLImage(url: posterURL)
+                                    .scaledToFit()
+                                    .frame(width: isPosterFullScreen ? UIScreen.main.bounds.width : 120,
+                                           height: isPosterFullScreen ? UIScreen.main.bounds.height : 200)
+                            }
                         }
                     }
-                }
-                Spacer()
-                ScrollView{
                     Text("Overview: \(movie.overview)")
                         .font(.headline)
+                        .foregroundColor(.black)
+                    //            .overlay(
+                    //                RoundedRectangle(cornerRadius: 10)
+                    //                    .stroke(Color.black, lineWidth: 2)
+                    //            )
+                        .padding(20)
                     if let backdropPath = movie.backdrop_path,
-                       let backdropURL = URL(string: "https://image.tmdb.org/t/p/w500\(backdropPath)") {
-                        Button(action: {
-                            isBackdropFullScreen.toggle()
-                        }) {
-                            URLImage(url: backdropURL)
+                       let posterURL = URL(string: "https://image.tmdb.org/t/p/w500\(backdropPath)") {
+                        NavigationLink(destination: FullScreenImageView(isFullScreen: $isBackdropFullScreen, imageUrl: posterURL, imageLoader: ImageLoader(url: posterURL))) {
+                            URLImage(url: posterURL)
                                 .scaledToFit()
-                                .frame(height: 200)
-                                .cornerRadius(10)
-                                .padding(.top, 10)
-                        }
-                        .fullScreenCover(isPresented: $isBackdropFullScreen) {
-                            FullScreenImageView(isFullScreen: $isBackdropFullScreen, imageUrl: backdropURL, imageLoader: ImageLoader(url: backdropURL))
+                                .frame(height: isPosterFullScreen ? UIScreen.main.bounds.height : 200)
                         }
                     } else {
                         Image(systemName: "photo")
@@ -172,24 +156,10 @@ struct MovieDetailsView: View {
                             .padding(.top, 10)
                     }
                 }
-                Spacer()
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }, label: {
-                    Image(systemName: "xmark.square.fill")
-                        .font(.largeTitle)
-                        .foregroundColor(Color.black)
-                })
             }
-            //.background(Color.clear)
-            .foregroundColor(.black)
-            .cornerRadius(15)
-            .frame(maxWidth: .infinity)
-            //            .overlay(
-            //                RoundedRectangle(cornerRadius: 10)
-            //                    .stroke(Color.black, lineWidth: 2)
-            //            )
-            .padding(20)
+            .navigationTitle(movie.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .font(.title)
         }
     }
 }
@@ -198,11 +168,12 @@ struct FullScreenImageView: View {
     @Binding var isFullScreen: Bool
     let imageUrl: URL
     @ObservedObject var imageLoader: ImageLoader
-
+    
     var body: some View {
         ZStack {
             Color("secondary")
                 .edgesIgnoringSafeArea(.all)
+                .blur(radius: 200)
             if let uiImage = imageLoader.image {
                 Image(uiImage: uiImage)
                     .resizable()
@@ -210,11 +181,6 @@ struct FullScreenImageView: View {
                     .foregroundColor(.white)
                     .cornerRadius(15)
                     .padding()
-            }
-        }
-        .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.5)) {
-                isFullScreen.toggle()
             }
         }
         .onAppear {
