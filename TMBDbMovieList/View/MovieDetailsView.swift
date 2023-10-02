@@ -52,11 +52,10 @@ struct MovieDetailsView: View {
                 }
                 if let posterPath = movie.poster_path,
                    let posterURL = URL(string: URLString + posterPath) {
-                    NavigationLink(destination: FullScreenImageView(isFullScreen: $isPosterFullScreen, imageUrl: posterURL, imageLoader: ImageLoader(url: posterURL))) {
+                    NavigationLink(destination: FullScreenImageView(imageUrl: posterURL, imageLoader: ImageLoader(url: posterURL))) {
                         URLImage(url: posterURL)
                             .scaledToFit()
-                            .frame(width: isPosterFullScreen ? UIScreen.main.bounds.width : 120,
-                                   height: isPosterFullScreen ? UIScreen.main.bounds.height : 200)
+                            .frame(width: 120, height : 200)
                     }
                 }
             }
@@ -70,10 +69,10 @@ struct MovieDetailsView: View {
                 .padding(20)
             if let backdropPath = movie.backdrop_path,
                let posterURL = URL(string: URLString + backdropPath) {
-                NavigationLink(destination: FullScreenImageView(isFullScreen: $isBackdropFullScreen, imageUrl: posterURL, imageLoader: ImageLoader(url: posterURL))) {
+                NavigationLink(destination: FullScreenImageView(imageUrl: posterURL, imageLoader: ImageLoader(url: posterURL))) {
                     URLImage(url: posterURL)
                         .scaledToFit()
-                        .frame(height: isPosterFullScreen ? UIScreen.main.bounds.height : 200)
+                        .frame(height: 200)
                 }
             } else {
                 Image(systemName: "photo")
@@ -82,33 +81,6 @@ struct MovieDetailsView: View {
                     .cornerRadius(10)
                     .padding(.top, 10)
             }
-        }
-    }
-    
-}
-
-struct FullScreenImageView: View {
-    @Binding var isFullScreen: Bool
-    let imageUrl: URL
-    @ObservedObject var imageLoader: ImageLoader
-    
-    var body: some View {
-        ZStack {
-            Color("secondary")
-                .edgesIgnoringSafeArea(.all)
-                .blur(radius: 200)
-            if let uiImage = imageLoader.image {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .foregroundColor(.white)
-                    .cornerRadius(15)
-                    .frame(width: .infinity, height: .infinity)
-                    .padding()
-            }
-        }
-        .onAppear {
-            imageLoader.loadImage(from: imageUrl)
         }
     }
 }

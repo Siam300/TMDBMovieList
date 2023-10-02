@@ -13,6 +13,7 @@
 		C903614E2A8F25BF00C5E44F /* MovieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C903614D2A8F25BF00C5E44F /* MovieView.swift */; };
 		C97D06432AB60653000CD2EB /* MovieViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C97D06422AB60653000CD2EB /* MovieViewModel.swift */; };
 		C98BCDF12AC863B600CA2CC0 /* MovieDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98BCDF02AC863B600CA2CC0 /* MovieDetailsView.swift */; };
+		C9946D982ACB05F300514D3C /* FullScreenImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9946D972ACB05F300514D3C /* FullScreenImageView.swift */; };
 		C9A7A7302ABC94C700C2A4A1 /* MovieModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A7A72F2ABC94C700C2A4A1 /* MovieModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +25,7 @@
 		C903614D2A8F25BF00C5E44F /* MovieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieView.swift; sourceTree = "<group>"; };
 		C97D06422AB60653000CD2EB /* MovieViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieViewModel.swift; sourceTree = "<group>"; };
 		C98BCDF02AC863B600CA2CC0 /* MovieDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailsView.swift; sourceTree = "<group>"; };
+		C9946D972ACB05F300514D3C /* FullScreenImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenImageView.swift; sourceTree = "<group>"; };
 		C9A7A72F2ABC94C700C2A4A1 /* MovieModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -80,6 +82,7 @@
 			children = (
 				C903614D2A8F25BF00C5E44F /* MovieView.swift */,
 				C98BCDF02AC863B600CA2CC0 /* MovieDetailsView.swift */,
+				C9946D972ACB05F300514D3C /* FullScreenImageView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -157,6 +160,7 @@
 				C903614E2A8F25BF00C5E44F /* MovieView.swift in Sources */,
 				C9A7A7302ABC94C700C2A4A1 /* MovieModel.swift in Sources */,
 				C90361402A8F259D00C5E44F /* TMBDbMovieListApp.swift in Sources */,
+				C9946D982ACB05F300514D3C /* FullScreenImageView.swift in Sources */,
 				C97D06432AB60653000CD2EB /* MovieViewModel.swift in Sources */,
 				C98BCDF12AC863B600CA2CC0 /* MovieDetailsView.swift in Sources */,
 			);
