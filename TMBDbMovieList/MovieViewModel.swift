@@ -52,6 +52,7 @@ class MovieViewModel: ObservableObject {
                     do {
                         let decodedData = try JSONDecoder().decode(MovieResponse.self, from: data)
                         self?.movies = decodedData.results
+                        self?.offset = 0
                     } catch let error {
                         print("JSON parsing error: \(error)")
                         self?.isError = true
