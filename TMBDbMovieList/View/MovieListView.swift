@@ -10,26 +10,63 @@ import SwiftUI
 struct MovieListView: View {
     @ObservedObject var viewModel: MovieViewModel
     @State private var selectedMovie: Movie?
+    @State var searchMovie = ""
     
     var body: some View {
         NavigationView {
             ZStack {
                 Color("primary")
                     .edgesIgnoringSafeArea(.all)
-                List {
-                    ForEach(viewModel.movies.indices, id: \.self) { index in
-                        let movie = viewModel.movies[index]
-                        NavigationLink(destination: MovieDetailsView(viewModel: viewModel, movie: movie)) {
-                            MovieView(movie: movie, index: index)
+                VStack {
+//                    HStack {
+//                        Image(systemName: "magnifyingglass")
+//                            .font(.system(size: 20, weight: .bold))
+//                            .foregroundColor(Color.gray)
+//                        TextField("Search", text: $searchMovie)
+//                    }
+//                    .padding(.vertical, 10)
+//                    .padding(.horizontal)
+//                    .background(Color.black.opacity(0.05))
+//                    .cornerRadius(8)
+//                    .padding(.horizontal)
+//
+//                    Rectangle()
+//                        .fill()
+//                        .frame(height: 0.9)
+//                        .padding()
+                    
+                    ScrollView {
+                        LazyVStack {
+                            ForEach(viewModel.movies.indices, id: \.self) { index in
+                                let movie = viewModel.movies[index]
+                                NavigationLink(destination: MovieDetailsView(viewModel: viewModel, movie: movie)) {
+                                    MovieView(movie: movie, index: index)
+                                }
+                                .onAppear {
+                                    if index == viewModel.movies.count - 1 {
+                                        viewModel.loadMoreData()
+                                    }
+                                    if index == 19 && viewModel.isLoading {
+                                        viewModel.setIsLoading(false)
+                                    }
+                                }
+                                Rectangle()
+                                    .fill()
+                                    .foregroundColor(Color.gray)
+                                    .frame(height: 0.5)
+                            }
                         }
+                        .background(Color("primary"))
+                        .foregroundColor(.black)
                     }
-                    .listRowBackground(Color("primary"))
+                    .padding(.horizontal, 15)
+                    .navigationBarTitle("Top Movies")
+                    .onAppear {
+                        viewModel.loadMoreData()
+                    }
                 }
-                .padding(0)
-                .navigationBarTitle("Top 20 Movies")
             }
         }
-        .listStyle(PlainListStyle())
     }
     
     func MovieView(movie: Movie, index: Int) -> some View {
@@ -39,7 +76,8 @@ struct MovieListView: View {
                let posterURL = URL(string: URLString + posterPath) {
                 URLImage(url: posterURL)
                     .frame(width: 140, height: 200)
-            } else {
+            }
+            else {
                 Image(systemName: "photo")
                     .resizable()
                     .scaledToFit()

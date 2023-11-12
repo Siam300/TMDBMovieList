@@ -12,6 +12,7 @@ struct TMBDbMovieListApp: App {
     var body: some Scene {
         WindowGroup {
             MovieListView(viewModel: MovieViewModel())
+            //SwiftUIView(viewModel: MovieViewModel())
         }
     }
 }

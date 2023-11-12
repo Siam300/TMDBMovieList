@@ -19,4 +19,5 @@ struct Movie: Identifiable, Decodable {
     let runtime: Int?
     let overview: String
     let release_date: String
+    //let page: Int
 }
