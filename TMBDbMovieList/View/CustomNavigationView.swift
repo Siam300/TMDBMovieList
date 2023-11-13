@@ -9,11 +9,20 @@ import SwiftUI
 
 struct CustomNavigationView: UIViewControllerRepresentable {
     
-    var view: MovieListView
+    var view: AnyView
+    
+    var largeTitle: Bool
+    var title: String
+    var placeHolder: String
+    
     var onSearch: (String) -> ()
     var onCancel: () -> ()
     
-    init(view: MovieListView, onSearch: @escaping (String) -> (), onCancel: @escaping () -> ()) {
+    init(view: AnyView, placeHolder: String? = "Search Movies", largeTitle: Bool? = true, title: String, onSearch: @escaping (String) -> (), onCancel: @escaping () -> ()) {
+        
+        self.title = title
+        self.largeTitle = largeTitle!
+        self.placeHolder = placeHolder!
         self.view = view
         self.onSearch = onSearch
         self.onCancel = onCancel
@@ -27,11 +36,11 @@ struct CustomNavigationView: UIViewControllerRepresentable {
         let childView = UIHostingController(rootView: view)
         let controller = UINavigationController(rootViewController: childView)
         
-        controller.navigationBar.topItem?.title = "Top Rated Movies"
-        controller.navigationBar.prefersLargeTitles = true
+        controller.navigationBar.topItem?.title = title
+        controller.navigationBar.prefersLargeTitles = largeTitle
         
         let searchController = UISearchController()
-        searchController.searchBar.placeholder = "Search"
+        searchController.searchBar.placeholder = placeHolder
         searchController.searchBar.delegate = context.coordinator
         
         searchController.obscuresBackgroundDuringPresentation = false
@@ -42,6 +51,10 @@ struct CustomNavigationView: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        
+        uiViewController.navigationBar.topItem?.title = title
+        uiViewController.navigationBar.topItem?.searchController?.searchBar.placeholder = placeHolder
+        uiViewController.navigationBar.prefersLargeTitles = largeTitle
         
     }
     

@@ -9,42 +9,41 @@ import SwiftUI
 
 struct MovieListView: View {
     @ObservedObject var viewModel: MovieViewModel
-    @State private var selectedMovie: Movie?
-    @State var searchMovie = ""
+    @Binding var movies: [Movie]
     
     var body: some View {
-        ZStack {
-            Color("primary")
-                .edgesIgnoringSafeArea(.all)
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack {
-                    ForEach(viewModel.movies.indices, id: \.self) { index in
-                        let movie = viewModel.movies[index]
-                        NavigationLink(destination: MovieDetailsView(viewModel: viewModel, movie: movie)) {
-                            MovieView(movie: movie, index: index)
-                        }
-                        .onAppear {
-                            if index == viewModel.movies.count - 1 {
-                                viewModel.loadMoreData()
+            ZStack {
+                Color("primary")
+                    .edgesIgnoringSafeArea(.all)
+                ScrollView(.vertical, showsIndicators: false) {
+                    LazyVStack {
+                        ForEach(viewModel.movies.indices, id: \.self) { index in
+                            let movie = viewModel.movies[index]
+                            NavigationLink(destination: MovieDetailsView(viewModel: viewModel, movie: movie)) {
+                                MovieView(movie: movie, index: index)
                             }
-                            if index == 19 && viewModel.isLoading {
-                                viewModel.setIsLoading(false)
+                            .onAppear {
+                                if index == viewModel.movies.count - 1 {
+                                    viewModel.loadMoreData()
+                                }
+                                if index == 19 && viewModel.isLoading {
+                                    viewModel.setIsLoading(false)
+                                }
                             }
+                            Rectangle()
+                                .fill()
+                                .foregroundColor(Color.gray)
+                                .frame(height: 0.5)
                         }
-                        Rectangle()
-                            .fill()
-                            .foregroundColor(Color.gray)
-                            .frame(height: 0.5)
                     }
+                    .background(Color("primary"))
+                    .foregroundColor(.black)
                 }
-                .background(Color("primary"))
-                .foregroundColor(.black)
+                .padding(.horizontal, 15)
+                .onAppear {
+                    viewModel.loadMoreData()
+                }
             }
-            .padding(.horizontal, 15)
-            .onAppear {
-                viewModel.loadMoreData()
-            }
-        }
     }
     
     func MovieView(movie: Movie, index: Int) -> some View {
@@ -69,7 +68,7 @@ struct MovieListView: View {
                 Text(movie.title)
                     .font(.headline)
                     .multilineTextAlignment(.leading)
-                
+
                     .foregroundColor(.black)
                 Text(String(format: "Average Vote: %.1f/10", movie.vote_average))
                     .font(.subheadline)
@@ -110,6 +109,6 @@ struct URLImage: View {
 
 struct MovieListView_Previews: PreviewProvider {
     static var previews: some View {
-        MovieListView(viewModel: MovieViewModel())
+        MovieListView(viewModel: MovieViewModel(), movies: .constant([]))
     }
 }

@@ -8,16 +8,28 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var movieViewModel = MovieViewModel()
+    
+    @StateObject var movieViewModel = MovieViewModel()
+    @State var movies: [Movie] = []
 
     var body: some View {
+        
         CustomNavigationView(
-            view: MovieListView(viewModel: movieViewModel),
+            view: AnyView(MovieListView(viewModel: movieViewModel, movies: $movies)),
+            placeHolder: "Search Movies",
+            largeTitle: true,
+            title: "Top Rated Movies",
             onSearch: { (txt) in
-                print("from SwiftUI")
+                print("Search")
+                if txt != "" {
+                    self.movies = movies.filter { $0.title.lowercased().contains(txt.lowercased()) }
+                } else {
+                    self.movies = movieViewModel.movies
+                }
             },
             onCancel: {
-                print("From Cancel")
+                self.movies = movieViewModel.movies
+                print("Cancel")
             }
         )
         .ignoresSafeArea()
@@ -26,6 +38,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(movies: [])
     }
 }

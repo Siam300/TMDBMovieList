@@ -28,15 +28,16 @@ class ImageLoader: ObservableObject {
 }
 
 class MovieViewModel: ObservableObject {
-    @Published private(set) var movies: [Movie] = []
+    
+    @Published var movies: [Movie] = []
     @Published var isError = false
-    @Published var page: Int = 1 
+    @Published var page: Int = 1
     @Published private(set) var isLoading = false
     
     init() {
         getData()
     }
-    
+
     func setIsLoading(_ value: Bool) {
             isLoading = value
         }
@@ -46,7 +47,7 @@ class MovieViewModel: ObservableObject {
             return
         }
         
-        isLoading = true 
+        isLoading = true
 
         guard let url = URL(string: "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=\(page)&sort_by=vote_average.desc&without_genres=99,10755&vote_count.gte=200&api_key=840e2c16b07096959518023fa50e8253") else {
             isLoading = false

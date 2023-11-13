@@ -24,7 +24,6 @@ struct MovieDetailsView: View {
                 movieDetails()
             }
             .navigationTitle(movie.title)
-            .navigationBarTitleDisplayMode(.inline)
             .font(.title)
         }
     }
@@ -33,10 +32,7 @@ struct MovieDetailsView: View {
         let URLString = "https://image.tmdb.org/t/p/w500"
         
         return VStack {
-            Text("Title: \(movie.title)")
-                .fontWeight(.bold)
-                .font(.title)
-                .multilineTextAlignment(.center)
+
             HStack {
                 VStack(alignment: .leading) {
                     Text("Language: \(movie.original_language)")

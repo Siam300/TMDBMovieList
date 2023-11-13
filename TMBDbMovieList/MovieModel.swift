@@ -20,4 +20,3 @@ struct Movie: Identifiable, Decodable {
     let overview: String
     let release_date: String
 }
-
