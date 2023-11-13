@@ -26,10 +26,11 @@ struct MovieListView: View {
                                 if index == viewModel.movies.count - 1 {
                                     viewModel.loadMoreData()
                                 }
-                                if index == 19 && viewModel.isLoading {
+                                if index < 20 && viewModel.isLoading {
                                     viewModel.setIsLoading(false)
                                 }
                             }
+                            .transition(.opacity) 
                             Rectangle()
                                 .fill()
                                 .foregroundColor(Color.gray)
@@ -40,9 +41,6 @@ struct MovieListView: View {
                     .foregroundColor(.black)
                 }
                 .padding(.horizontal, 15)
-                .onAppear {
-                    viewModel.loadMoreData()
-                }
             }
     }
     
@@ -86,11 +84,9 @@ struct MovieListView: View {
 
 struct URLImage: View {
     @ObservedObject var imageLoader: ImageLoader
-    let placeholder: Image
     
-    init(url: URL, placeholder: Image = Image(systemName: "photo")) {
+    init(url: URL) {
         imageLoader = ImageLoader(url: url)
-        self.placeholder = placeholder
     }
     
     var body: some View {
@@ -100,9 +96,7 @@ struct URLImage: View {
                 .scaledToFit()
                 .cornerRadius(10)
         } else {
-            placeholder
-                .resizable()
-                .scaledToFit()
+            ProgressView()
         }
     }
 }
