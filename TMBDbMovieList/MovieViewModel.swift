@@ -30,7 +30,7 @@ class ImageLoader: ObservableObject {
 class MovieViewModel: ObservableObject {
     @Published private(set) var movies: [Movie] = []
     @Published var isError = false
-    @Published var page: Int = 1 // Start from page 1
+    @Published var page: Int = 1 
     @Published private(set) var isLoading = false
     
     init() {
@@ -83,7 +83,6 @@ class MovieViewModel: ObservableObject {
         getData()
     }
 }
-
 
 struct MovieResponse: Decodable {
     let results: [Movie]

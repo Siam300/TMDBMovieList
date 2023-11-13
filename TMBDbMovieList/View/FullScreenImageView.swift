@@ -27,6 +27,7 @@ struct FullScreenImageView: View {
                     .frame(maxWidth: shouldAnimate ? .infinity : 200, maxHeight: shouldAnimate ? .infinity : 200)
                     .padding(5)
                     .transition(.asymmetric(insertion: .identity, removal: .opacity))
+                    .foregroundColor(.black)
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {

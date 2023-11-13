@@ -56,16 +56,13 @@ struct MovieDetailsView: View {
                         URLImage(url: posterURL)
                             .scaledToFit()
                             .frame(width: 120, height : 200)
+                            .foregroundColor(.black)
                     }
                 }
             }
             Text("Overview: \(movie.overview)")
                 .font(.headline)
                 .foregroundColor(.black)
-            //            .overlay(
-            //                RoundedRectangle(cornerRadius: 10)
-            //                    .stroke(Color.black, lineWidth: 2)
-            //            )
                 .padding(20)
             if let backdropPath = movie.backdrop_path,
                let posterURL = URL(string: URLString + backdropPath) {
@@ -73,6 +70,7 @@ struct MovieDetailsView: View {
                     URLImage(url: posterURL)
                         .scaledToFit()
                         .frame(height: 200)
+                        .foregroundColor(.black)
                 }
             } else {
                 Image(systemName: "photo")
@@ -80,6 +78,7 @@ struct MovieDetailsView: View {
                     .frame(width: .infinity, height: 200)
                     .cornerRadius(10)
                     .padding(.top, 10)
+                    .foregroundColor(.black)
             }
         }
     }

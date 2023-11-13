@@ -13,58 +13,36 @@ struct MovieListView: View {
     @State var searchMovie = ""
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color("primary")
-                    .edgesIgnoringSafeArea(.all)
-                VStack {
-//                    HStack {
-//                        Image(systemName: "magnifyingglass")
-//                            .font(.system(size: 20, weight: .bold))
-//                            .foregroundColor(Color.gray)
-//                        TextField("Search", text: $searchMovie)
-//                    }
-//                    .padding(.vertical, 10)
-//                    .padding(.horizontal)
-//                    .background(Color.black.opacity(0.05))
-//                    .cornerRadius(8)
-//                    .padding(.horizontal)
-//
-//                    Rectangle()
-//                        .fill()
-//                        .frame(height: 0.9)
-//                        .padding()
-                    
-                    ScrollView {
-                        LazyVStack {
-                            ForEach(viewModel.movies.indices, id: \.self) { index in
-                                let movie = viewModel.movies[index]
-                                NavigationLink(destination: MovieDetailsView(viewModel: viewModel, movie: movie)) {
-                                    MovieView(movie: movie, index: index)
-                                }
-                                .onAppear {
-                                    if index == viewModel.movies.count - 1 {
-                                        viewModel.loadMoreData()
-                                    }
-                                    if index == 19 && viewModel.isLoading {
-                                        viewModel.setIsLoading(false)
-                                    }
-                                }
-                                Rectangle()
-                                    .fill()
-                                    .foregroundColor(Color.gray)
-                                    .frame(height: 0.5)
+        ZStack {
+            Color("primary")
+                .edgesIgnoringSafeArea(.all)
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVStack {
+                    ForEach(viewModel.movies.indices, id: \.self) { index in
+                        let movie = viewModel.movies[index]
+                        NavigationLink(destination: MovieDetailsView(viewModel: viewModel, movie: movie)) {
+                            MovieView(movie: movie, index: index)
+                        }
+                        .onAppear {
+                            if index == viewModel.movies.count - 1 {
+                                viewModel.loadMoreData()
+                            }
+                            if index == 19 && viewModel.isLoading {
+                                viewModel.setIsLoading(false)
                             }
                         }
-                        .background(Color("primary"))
-                        .foregroundColor(.black)
-                    }
-                    .padding(.horizontal, 15)
-                    .navigationBarTitle("Top Movies")
-                    .onAppear {
-                        viewModel.loadMoreData()
+                        Rectangle()
+                            .fill()
+                            .foregroundColor(Color.gray)
+                            .frame(height: 0.5)
                     }
                 }
+                .background(Color("primary"))
+                .foregroundColor(.black)
+            }
+            .padding(.horizontal, 15)
+            .onAppear {
+                viewModel.loadMoreData()
             }
         }
     }
@@ -90,6 +68,8 @@ struct MovieListView: View {
                     .padding(.trailing)
                 Text(movie.title)
                     .font(.headline)
+                    .multilineTextAlignment(.leading)
+                
                     .foregroundColor(.black)
                 Text(String(format: "Average Vote: %.1f/10", movie.vote_average))
                     .font(.subheadline)

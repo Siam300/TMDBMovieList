@@ -11,8 +11,10 @@ import SwiftUI
 struct TMBDbMovieListApp: App {
     var body: some Scene {
         WindowGroup {
-            MovieListView(viewModel: MovieViewModel())
+            //MovieListView(viewModel: MovieViewModel())
             //SwiftUIView(viewModel: MovieViewModel())
+            ContentView()
+
         }
     }
 }
