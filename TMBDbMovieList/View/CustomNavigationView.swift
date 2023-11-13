@@ -34,7 +34,7 @@ struct CustomNavigationView: UIViewControllerRepresentable {
         searchController.searchBar.placeholder = "Search"
         searchController.searchBar.delegate = context.coordinator
         
-        searchController.obscuresBackgroundDuringPresentation = true
+        searchController.obscuresBackgroundDuringPresentation = false
         controller.navigationBar.topItem?.hidesSearchBarWhenScrolling = false
         controller.navigationBar.topItem?.searchController = searchController
         
