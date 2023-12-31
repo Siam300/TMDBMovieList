@@ -23,12 +23,7 @@ struct MovieListView: View {
                                 MovieView(movie: movie, index: index)
                             }
                             .onAppear {
-                                if index == viewModel.movies.count - 1 {
-                                    viewModel.loadMoreData()
-                                }
-                                if index < 20 && viewModel.isLoading {
-                                    viewModel.setIsLoading(false)
-                                }
+                                viewModel.loadMoreData()
                             }
                             .transition(.opacity) 
                             Rectangle()
@@ -83,20 +78,30 @@ struct MovieListView: View {
 }
 
 struct URLImage: View {
-    @ObservedObject var imageLoader: ImageLoader
+    private let url: URL
     
     init(url: URL) {
-        imageLoader = ImageLoader(url: url)
+        self.url = url
     }
-    
+
     var body: some View {
-        if let uiImage = imageLoader.image {
-            Image(uiImage: uiImage)
-                .resizable()
-                .scaledToFit()
-                .cornerRadius(10)
-        } else {
-            ProgressView()
+        AsyncImage(url: url) { phase in
+            switch phase {
+            case .empty:
+                ProgressView()
+            case .success(let image):
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .cornerRadius(10)
+            case .failure:
+                Image(systemName: "photo")
+                    .resizable()
+                    .scaledToFit()
+                    .cornerRadius(10)
+            @unknown default:
+                EmptyView()
+            }
         }
     }
 }
